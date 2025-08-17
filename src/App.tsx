@@ -1,10 +1,12 @@
-import "./App.css";
+import React from 'react';
+import MainLayout from './components/Layout/MainLayout';
+import DashboardContent from './components/Dashboard/DashboardContent';
 
 function App() {
   return (
-    <div className='flex justify-center items-center h-screen'>
-      <h1 className='text-3xl font-bold  text-red-500'>Hello World!</h1>
-    </div>
+    <MainLayout userName="John Doe">
+      <DashboardContent />
+    </MainLayout>
   );
 }
 
