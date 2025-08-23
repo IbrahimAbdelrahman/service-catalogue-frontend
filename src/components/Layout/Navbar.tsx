@@ -13,7 +13,7 @@ const Navbar: React.FC<NavbarProps> = ({ userName, userAvatar }) => {
         <div className="flex items-center">
           <div className="w-14 h-14 rounded-lg flex items-center justify-center mr-3 p-1 bg-transparent">
             <img
-              src="public/images/Group 5.svg"
+              src="public/images/Vodafone_logo.svg"
               alt="Logo"
               className="w-full h-full object-contain"
             />
