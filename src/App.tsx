@@ -4,7 +4,7 @@ import DashboardContent from './components/Dashboard/DashboardContent';
 
 function App() {
   return (
-    <MainLayout userName="John Doe">
+    <MainLayout userName="Yasmine Saber">
       <DashboardContent />
     </MainLayout>
   );
