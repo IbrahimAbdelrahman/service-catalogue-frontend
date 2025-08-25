@@ -1,31 +1,32 @@
-import React, { useState } from 'react';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import React from "react";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
 interface MainLayoutProps {
   children: React.ReactNode;
   userName?: string;
+  activeItem: string;
+  onItemClick: (itemId: string) => void;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, userName = 'Admin User' }) => {
-  const [activeSidebarItem, setActiveSidebarItem] = useState('dashboard');
-
-  const handleSidebarItemClick = (itemId: string) => {
-    setActiveSidebarItem(itemId);
-  };
-
+const MainLayout: React.FC<MainLayoutProps> = ({ 
+  children, 
+  userName = "Admin User",
+  activeItem,
+  onItemClick
+}) => {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Navbar - Always visible */}
+      {/* Top Navbar */}
       <Navbar userName={userName} />
-      
+
       <div className="flex h-[calc(100vh-80px)]">
         {/* Sidebar */}
         <Sidebar 
-          activeItem={activeSidebarItem} 
-          onItemClick={handleSidebarItemClick} 
+          activeItem={activeItem} 
+          onItemClick={onItemClick} 
         />
-        
+
         {/* Main Content Area */}
         <main className="flex-1 overflow-auto">
           <div className="p-6">
