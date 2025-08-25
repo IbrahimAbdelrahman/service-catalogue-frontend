@@ -1,254 +1,291 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
-const API_BASE = "https://localhost:44374/api/Team";
+interface Team {
+  id: string;
+  name: string;
+  description: string;
+}
 
 const TeamPage: React.FC = () => {
-  const [mode, setMode] = useState<null | string>(null);
-  const [teamId, setTeamId] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [message, setMessage] = useState("");
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [editRow, setEditRow] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<Team>>({});
+  const [searchId, setSearchId] = useState<string>("");
+  const [view, setView] = useState<"menu" | "list" | "create">("menu");
+  const [newTeam, setNewTeam] = useState<Partial<Team>>({
+    name: "",
+    description: "",
+  });
 
-  // CRUD Functions
-  const listTeams = async () => {
+  const baseUrl = "https://localhost:44374/api/Team";
+
+  // Fetch teams
+  const fetchTeams = async () => {
     try {
-      const res = await axios.get(API_BASE);
-      setTeams(res.data);
-      setMessage("Fetched all teams ✅");
-      setMode("list");
-    } catch (err: any) {
-      setMessage(`Error fetching teams ❌: ${err.message}`);
+      const res = await fetch(baseUrl);
+      const data = await res.json();
+      setTeams(data);
+    } catch (err) {
+      console.error("Error fetching teams:", err);
     }
   };
 
-  const getTeam = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/${teamId}`);
-      setMessage(`Team fetched: ${res.data.name}`);
-    } catch {
-      setMessage("Error fetching team ❌");
+  // Delete team
+  const handleDelete = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete team "${name}"?`)) {
+      try {
+        await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+        setTeams(teams.filter((t) => t.id !== id));
+      } catch (err) {
+        console.error("Delete failed:", err);
+      }
     }
   };
 
-  const createTeam = async () => {
+  // Update team
+  const handleUpdate = async (id: string) => {
     try {
-      await axios.post(API_BASE, { name, description });
-      setMessage("Team created ✅");
-    } catch {
-      setMessage("Error creating team ❌");
+      const updatedTeam = { ...editData, id };
+      await fetch(baseUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTeam),
+      });
+      setTeams(
+        teams.map((t) => (t.id === id ? ({ ...t, ...editData } as Team) : t))
+      );
+      setEditRow(null);
+      setEditData({});
+    } catch (err) {
+      console.error("Update failed:", err);
     }
   };
 
-  const updateTeam = async () => {
+  // Search team by ID
+  const handleSearch = async () => {
+    if (!searchId.trim()) {
+      alert("Please enter a Team ID to search.");
+      return;
+    }
     try {
-      await axios.put(`${API_BASE}/${teamId}`, { name, description });
-      setMessage("Team updated ✅");
-    } catch {
-      setMessage("Error updating team ❌");
+      const res = await fetch(`${baseUrl}/${searchId}`);
+      if (!res.ok) {
+        alert("❌ Team not found");
+        return;
+      }
+      const team: Team = await res.json();
+      alert(`✅ Team "${team.name}" found!`);
+    } catch (err) {
+      console.error("Search failed:", err);
+      alert("❌ Error searching for team");
     }
   };
 
-  const deleteTeam = async () => {
+  // Create new team
+  const handleCreate = async () => {
     try {
-      await axios.delete(`${API_BASE}/${teamId}`);
-      setMessage("Team deleted ✅");
-    } catch {
-      setMessage("Error deleting team ❌");
-    }
-  };
-
-  // Form Renderer
-  const renderForm = () => {
-    const backButton = (
-      <button
-        onClick={() => setMode(null)}
-        className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
-      >
-        Back
-      </button>
-    );
-
-    switch (mode) {
-      case "get":
-        return (
-          <div className="mt-4">
-            <input
-              placeholder="Enter Team ID"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <button
-              onClick={getTeam}
-              className="bg-green-500 text-white px-4 py-2 rounded"
-            >
-              Fetch Team
-            </button>
-            {backButton}
-          </div>
-        );
-      case "create":
-        return (
-          <div className="mt-4">
-            <input
-              placeholder="Team Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <input
-              placeholder="Team Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <button
-              onClick={createTeam}
-              className="bg-purple-500 text-white px-4 py-2 rounded"
-            >
-              Create Team
-            </button>
-            {backButton}
-          </div>
-        );
-      case "update":
-        return (
-          <div className="mt-4">
-            <input
-              placeholder="Enter Team ID"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <input
-              placeholder="Team Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <input
-              placeholder="Team Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <button
-              onClick={updateTeam}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              Update Team
-            </button>
-            {backButton}
-          </div>
-        );
-      case "delete":
-        return (
-          <div className="mt-4">
-            <input
-              placeholder="Enter Team ID"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="border p-2 w-full mb-2"
-            />
-            <button
-              onClick={deleteTeam}
-              className="bg-red-500 text-white px-4 py-2 rounded"
-            >
-              Delete Team
-            </button>
-            {backButton}
-          </div>
-        );
-      case "list":
-        return (
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold mb-2">All Teams</h2>
-            {teams.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-300">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="border px-4 py-2 text-left">ID</th>
-                      <th className="border px-4 py-2 text-left">Name</th>
-                      <th className="border px-4 py-2 text-left">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {teams.map((t) => (
-                      <tr key={t.id} className="hover:bg-gray-50">
-                        <td className="border px-4 py-2">{t.id}</td>
-                        <td className="border px-4 py-2">{t.name}</td>
-                        <td className="border px-4 py-2">{t.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>No teams found.</p>
-            )}
-            {backButton}
-          </div>
-        );
-      default:
-        return null;
+      await fetch(baseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTeam),
+      });
+      alert("✅ Team created successfully!");
+      setNewTeam({ name: "", description: "" });
+      setView("menu");
+    } catch (err) {
+      console.error("Create failed:", err);
     }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Team Management</h1>
+      {/* ✅ Title in top-left */}
+      <h1 className="text-2xl font-bold text-red-600 mb-6">Team Management</h1>
 
-      {!mode && (
-        <div className="grid grid-cols-2 gap-6">
-          {/* Each button is styled as a white rectangle with image + label */}
+      {view === "menu" && (
+        <div className="flex gap-8 justify-center mt-10">
+          {/* List All Teams */}
           <button
-            onClick={listTeams}
-            className="flex flex-col items-center justify-center bg-white border border-gray-300 shadow p-6 rounded-lg hover:bg-red-500 hover:text-white transition"
+            onClick={() => {
+              fetchTeams();
+              setView("list");
+            }}
+            className="flex flex-col items-center bg-white text-red-600 border border-red-600 
+                       px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white 
+                       transition-all duration-200"
           >
-            <img src="public/Images/List.svg" alt="List" className="w-10 h-10 mb-2" />
-            <span className="font-medium">List All Teams</span>
+            <img src="public/images/List.svg" alt="list" className="w-28 h-28" />
+            <span className="mt-4 text-lg font-bold">List All Teams</span>
           </button>
 
+          {/* Create Team */}
           <button
-            onClick={() => setMode("get")}
-            className="flex flex-col items-center justify-center bg-white border border-gray-300 shadow p-6 rounded-lg hover:bg-red-500 hover:text-white transition"
+            onClick={() => setView("create")}
+            className="flex flex-col items-center bg-white text-red-600 border border-red-600 
+                       px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white 
+                       transition-all duration-200"
           >
-            <img src="public/Images/Get team.svg" alt="Get" className="w-10 h-10 mb-2" />
-            <span className="font-medium">Get Team</span>
-          </button>
-
-          <button
-            onClick={() => setMode("create")}
-            className="flex flex-col items-center justify-center bg-white border border-gray-300 shadow p-6 rounded-lg hover:bg-red-500 hover:text-white transition"
-          >
-            <img src="public/Images/Create.svg" alt="Create" className="w-10 h-10 mb-2" />
-            <span className="font-medium">Create Team</span>
-          </button>
-
-          <button
-            onClick={() => setMode("update")}
-            className="flex flex-col items-center justify-center bg-white border border-gray-300 shadow p-6 rounded-lg hover:bg-red-500 hover:text-white transition"
-          >
-            <img src="public/Images/Update.svg" alt="Update" className="w-10 h-10 mb-2" />
-            <span className="font-medium">Update Team</span>
-          </button>
-
-          <button
-            onClick={() => setMode("delete")}
-            className="flex flex-col items-center justify-center bg-white border border-gray-300 shadow p-6 rounded-lg hover:bg-red-500 hover:text-white transition"
-          >
-            <img src="public/Images/Delete.svg" alt="Delete" className="w-10 h-10 mb-2" />
-            <span className="font-medium">Delete Team</span>
+            <img src="public/images/Create.svg" alt="create" className="w-28 h-28" />
+            <span className="mt-4 text-lg font-bold">Create Team</span>
           </button>
         </div>
       )}
 
-      {renderForm()}
+      {view === "list" && (
+        <div>
+          {/* Search bar */}
+          <div className="mb-4 flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Enter Team ID"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              className="border p-2 rounded w-1/3"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2"
+            >
+              <img src="public/images/search.svg" alt="search" className="w-8 h-8" />
+              Search
+            </button>
+          </div>
 
-      {message && <p className="mt-4 font-semibold">{message}</p>}
+          {/* Team table */}
+          <table className="w-full border border-red-600 rounded-lg">
+            <thead>
+              <tr className="bg-red-600 text-white">
+                <th className="p-2 text-left">ID</th>
+                <th className="p-2 text-left">Name</th>
+                <th className="p-2 text-left">Description</th>
+                <th className="p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {teams.map((team) => (
+                <tr key={team.id} className="border-t border-red-600">
+                  <td className="p-2">{team.id}</td>
+                  <td className="p-2">
+                    {editRow === team.id ? (
+                      <input
+                        value={editData.name || team.name}
+                        onChange={(e) =>
+                          setEditData({ ...editData, name: e.target.value })
+                        }
+                        className="border p-1 rounded"
+                      />
+                    ) : (
+                      team.name
+                    )}
+                  </td>
+                  <td className="p-2">
+                    {editRow === team.id ? (
+                      <input
+                        value={editData.description || team.description}
+                        onChange={(e) =>
+                          setEditData({ ...editData, description: e.target.value })
+                        }
+                        className="border p-1 rounded"
+                      />
+                    ) : (
+                      team.description
+                    )}
+                  </td>
+                  <td className="p-2 relative">
+                    <button
+                      onClick={() =>
+                        setMenuOpen(menuOpen === team.id ? null : team.id)
+                      }
+                      className="px-2 py-1 border rounded bg-red-600 text-white hover:bg-red-700"
+                    >
+                      <img src="public/images/menu.svg" alt="menu" className="w-6 h-6" />
+                    </button>
+
+                    {menuOpen === team.id && (
+                      <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+                        {editRow === team.id ? (
+                          <button
+                            onClick={() => handleUpdate(team.id)}
+                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            <img src="public/images/save.svg" alt="save" className="w-4 h-4" />
+                            Save
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setEditRow(team.id);
+                              setEditData(team);
+                              setMenuOpen(null);
+                            }}
+                            className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            <img src="public/images/edit.svg" alt="edit" className="w-4 h-4" />
+                            Update
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(team.id, team.name)}
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                        >
+                          <img src="public/images/Delete.svg" alt="delete" className="w-4 h-4" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Back button */}
+          <div className="mt-4">
+            <button
+              onClick={() => setView("menu")}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2"
+            >
+              <img src="public/images/back.svg" alt="back" className="w-4 h-4" />
+              Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {view === "create" && (
+        <div className="max-w-md mx-auto mt-6">
+          <h2 className="text-xl font-bold mb-4 text-red-600">Create Team</h2>
+          <input
+            type="text"
+            placeholder="Name"
+            value={newTeam.name}
+            onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
+            className="border p-2 rounded w-full mb-2"
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={newTeam.description}
+            onChange={(e) =>
+              setNewTeam({ ...newTeam, description: e.target.value })
+            }
+            className="border p-2 rounded w-full mb-4"
+          />
+          <button
+            onClick={handleCreate}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Create
+          </button>
+          <button
+            onClick={() => setView("menu")}
+            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 };
