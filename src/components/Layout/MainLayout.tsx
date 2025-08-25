@@ -1,6 +1,7 @@
-import React from "react";
-import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import React from 'react';
+import Navbar from './Navbar';
+import Sidebar from './Sidebar';
+
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,7 +12,9 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ 
   children, 
-  userName = "Admin User",
+
+  userName = 'Admin User',
+
   activeItem,
   onItemClick
 }) => {
@@ -27,11 +30,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           onItemClick={onItemClick} 
         />
 
+
         {/* Main Content Area */}
+
         <main className="flex-1 overflow-auto">
-          <div className="p-6">
-            {children}
-          </div>
+          <div className="p-6">{children}</div>
         </main>
       </div>
     </div>

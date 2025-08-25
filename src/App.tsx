@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import MainLayout from "./components/Layout/MainLayout";
 import DashboardContent from "./components/Dashboard/DashboardContent";
+import TeamPage from "./Pages/TeamPage";
 import SquadPage from "./Pages/SquadPage";
+
 
 function App() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -11,9 +13,12 @@ function App() {
       case "dashboard":
         return <DashboardContent />;
       case "teams":
-        return <h1>Teams Page</h1>;
+
+        return <TeamPage />;
+
       case "squads":
         return <SquadPage />;
+
       case "projects":
         return <h1>Projects Page</h1>;
       case "services":
