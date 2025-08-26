@@ -1,176 +1,371 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
-const API_BASE = "https://localhost:44374/api/Service";
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+  squadId: string;
+  squadName: string;
+}
 
 const ServicePage: React.FC = () => {
-  const [mode, setMode] = useState<null | string>(null);
-  const [serviceId] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [squadId, setSquadId] = useState("");
-  const [message, setMessage] = useState("");
-  const [services, setServices] = useState<any[]>([]);
-  const [selectedService, setSelectedService] = useState<any | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [editRow, setEditRow] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<Service>>({});
+  const [searchName, setSearchName] = useState<string>("");
+  const [view, setView] = useState<"menu" | "list" | "create">("menu");
+  const [newService, setNewService] = useState<Partial<Service>>({
+    name: "",
+    description: "",
+    squadId: "",
+  });
 
-  // CRUD Functions
-  const listServices = async () => {
+  // dialogs
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<{
+    open: boolean;
+    id?: string;
+    name?: string;
+  }>({ open: false });
+
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    text: string;
+  }>({ open: false, text: "" });
+
+  const baseUrl = "https://localhost:44374/api/Service";
+
+  // Fetch services
+  const fetchServices = async () => {
     try {
-      const res = await axios.get(API_BASE);
-      setServices(res.data);
-      console.log(res.data);
-      setMessage("Fetched all services ✅");
-      setMode("list");
-    } catch (err: any) {
-      setMessage(`Error fetching services ❌: ${err.message}`);
+      const url = searchName.trim()
+      ? `${baseUrl}?search=${encodeURIComponent(searchName)}`
+      : baseUrl;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      setServices(data);
+    } catch (err) {
+      console.error("Error fetching services:", err);
     }
   };
 
-  const getService = async () => {
+  // Delete service
+  const handleDelete = async (id: string) => {
     try {
-      const res = await axios.get(`${API_BASE}/${squadId}`);
-      setSelectedService(res.data);
-      setMessage(`Service fetched: ${res.data.name}`);
-    } catch {
-      setMessage("Error fetching service ❌");
+      const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete service.");
+
+      setServices(services.filter((s) => s.id !== id));
+      setShowDeleteDialog({ open: false });
+      setMessageDialog({ open: true, text: "✅ Service deleted successfully!" });
+    } catch (err) {
+      console.error("Delete failed:", err);
+      setMessageDialog({ open: true, text: "❌ Error deleting service." });
     }
   };
 
-  const createService = async () => {
+  // Update service
+const handleUpdate = async (id: string) => {
+  try {
+    const updatedService = { ...editData }; 
+    const res = await fetch(`${baseUrl}/${id}`, { 
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedService),
+    });
+
+    if (!res.ok) throw new Error("Failed to update service.");
+
+    setServices(
+      services.map((s) =>
+        s.id === id ? ({ ...s, ...editData } as Service) : s
+      )
+    );
+    setEditRow(null);
+    setEditData({});
+    setShowUpdateDialog(false);
+    setMessageDialog({ open: true, text: "✅ Service updated successfully!" });
+  } catch (err) {
+    console.error("Update failed:", err);
+    setMessageDialog({ open: true, text: "❌ Error updating service." });
+  }
+};
+
+
+  // Create service
+  const handleCreate = async () => {
     try {
-      await axios.post(API_BASE, { name, description, squadId });
-      setMessage("Service created ✅");
-    } catch {
-      setMessage("Error creating service ❌");
+      await fetch(baseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newService),
+      });
+      setMessageDialog({ open: true, text: "✅ Service created successfully!" });
+      setNewService({ name: "", description: "", squadId: "" });
+      setView("menu");
+    } catch (err) {
+      console.error("Create failed:", err);
+      setMessageDialog({ open: true, text: "❌ Error creating service." });
     }
   };
 
-  const updateService = async () => {
-    try {
-      await axios.put(API_BASE, { id: serviceId, name, description, squadId });
-      setMessage("Service updated ✅");
-    } catch {
-      setMessage("Error updating service ❌");
-    }
-  };
+  useEffect(() => {
+  const delayDebounce = setTimeout(() => {
+    fetchServices();
+  }, 400); // wait 400ms after typing
 
-  const deleteservice = async () => {
-    try {
-      await axios.delete(`${API_BASE}/${serviceId}`);
-      setMessage("Service deleted ✅");
-    } catch {
-      setMessage("Error deleting service ❌");
-    }
-  };
+  return () => clearTimeout(delayDebounce);
+}, [searchName]);
 
-  // Form Renderer
-  const renderForm = () => {
-    switch (mode) {
-      case "create":
-  return (
-    <div className="mt-4 flex flex-col items-start">
-      <input
-        placeholder="Service Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="border p-2 w-96 mb-2 rounded"
-      />
-      <input
-        placeholder="Service Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="border p-2 w-96 mb-2 rounded"
-      />
-      <input
-        placeholder="Squad ID"
-        value={squadId}
-        onChange={(e) => setSquadId(e.target.value)}
-        className="border p-2 w-96 mb-4 rounded"
-      />
-      <button
-        onClick={createService}
-        className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
-      >
-        Create Service
-      </button>
-    </div>
-  );
-
-      case "list":
-        return (
-          <div className="mt-4">
-            <h2 className="text-xl font-bold mb-4 text-red-600">All Services</h2>
-            {services.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full border border-red-600 rounded-lg">
-                  <thead>
-                    <tr className="bg-red-600 text-white">
-                      <th className="p-2 text-left">ID</th>
-                      <th className="p-2 text-left">Name</th>
-                      <th className="p-2 text-left">Description</th>
-                      <th className="p-2 text-left">Squad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {services.map((s) => (
-                      <tr key={s.id} className="border-t border-red-600 hover:bg-gray-50">
-                        <td className="p-2">{s.id}</td>
-                        <td className="p-2">{s.name}</td>
-                        <td className="p-2">{s.description}</td>
-                        <td className="p-2">{s.squad?.name ?? "No Squad"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>No services found.</p>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-red-600">
-        {mode === "list"
-          ? "Service List"
-          : mode === "create"
-          ? "Create Service"
-          : "Service Management"}
-      </h1>
+      {/* Title */}
+      {view !== "create" && (
+        <h1 className="text-2xl font-bold text-red-600 mb-6">
+          Service Management
+        </h1>
+      )}
 
-      {!mode && (
-  <div className="flex justify-between mt-10">
-    <button
-      onClick={listServices}
-      className="flex flex-col items-center bg-white text-red-600 border border-red-600 
-                 px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white 
-                 transition-all duration-200"
-    >
-      <img src="public/Images/List.svg" alt="List" className="w-12 h-12" />
-      <span className="mt-4 text-lg font-bold">List All Services</span>
-    </button>
+      {/* Update Dialog */}
+      {showUpdateDialog && editRow && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Update Service</h2>
 
-    <button
-      onClick={() => setMode("create")}
-      className="flex flex-col items-center bg-white text-red-600 border border-red-600 
-                 px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white 
-                 transition-all duration-200"
-    >
-      <img src="public/Images/Create.svg" alt="Create" className="w-12 h-12" />
-      <span className="mt-4 text-lg font-bold">Create Service</span>
-    </button>
-  </div>
-)}
+            <label className="block text-sm font-medium mb-1">Name</label>
+            <input
+              type="text"
+              value={editData.name || ""}
+              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+              className="p-2 rounded w-full mb-2 border"
+            />
 
-      {renderForm()}
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <input
+              type="text"
+              value={editData.description || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, description: e.target.value })
+              }
+              className="p-2 rounded w-full mb-2 border"
+            />
 
-      {message && <p className="mt-4 font-semibold text-red-600">{message}</p>}
+            <label className="block text-sm font-medium mb-1">Squad ID</label>
+            <input
+              type="text"
+              value={editData.squadId || ""}
+              onChange={(e) => setEditData({ ...editData, squadId: e.target.value })}
+              className="p-2 rounded w-full mb-4 border"
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => handleUpdate(editRow)}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setShowUpdateDialog(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Dialog */}
+      {showDeleteDialog.open && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+            <h2 className="text-lg font-bold text-red-600 mb-4">Confirm Delete</h2>
+            <p>
+              Are you sure you want to delete service{" "}
+              <span className="font-semibold">{showDeleteDialog.name}</span>?
+            </p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => handleDelete(showDeleteDialog.id!)}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setShowDeleteDialog({ open: false })}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Message Dialog */}
+      {messageDialog.open && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
+            <p className="mb-4">{messageDialog.text}</p>
+            <button
+              onClick={() => setMessageDialog({ open: false, text: "" })}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Menu */}
+      {view === "menu" && (
+        <div className="flex gap-20 justify-center mt-20">
+          <button
+            onClick={() => {
+              fetchServices();
+              setView("list");
+            }}
+            className="flex flex-col items-center bg-white text-red-600 border border-red-600 px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white transition-all"
+          >
+            <img src="public/images/list.svg" alt="list" className="w-38 h-38" />
+            <span className="mt-4 text-lg font-bold">List All Services</span>
+          </button>
+
+          <button
+            onClick={() => setView("create")}
+            className="flex flex-col items-center bg-white text-red-600 border border-red-600 px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white transition-all"
+          >
+            <img src="public/images/Create.svg" alt="create" className="w-38 h-38" />
+            <span className="mt-4 text-lg font-bold">Create Service</span>
+          </button>
+        </div>
+      )}
+
+      {/* List View */}
+      {view === "list" && (
+        <div>
+          {/* Search */}
+          <div className="mb-4 flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search By Service Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              className="p-2 rounded w-1/3 bg-gray-100"
+            />
+          </div>
+
+
+          {/* Table */}
+          <div className="bg-white rounded-xl shadow">
+            <table className="w-full text-sm text-left text-gray-600">
+              <thead>
+                <tr className="bg-gray-100 text-gray-500 text-xs uppercase">
+                  <th className="px-6 py-3">Name</th>
+                  <th className="px-6 py-3">Description</th>
+                  <th className="px-6 py-3">Squad Name</th>
+                  <th className="px-6 py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {services.map((s) => (
+                  <tr key={s.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-semibold">{s.name}</td>
+                    <td className="px-6 py-4">{s.description}</td>
+                    <td className="px-6 py-4">{s.squadName}</td>
+                    <td className="px-6 py-4 text-center relative">
+                      <img
+                        src="public/images/menu.svg"
+                        alt="menu"
+                        className="w-6 h-6 cursor-pointer"
+                        onClick={() => setMenuOpen(menuOpen === s.id ? null : s.id)}
+                      />
+                      {menuOpen === s.id && (
+                        <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg z-50">
+                          <button
+                            onClick={() => {
+                              setEditRow(s.id);
+                              setEditData(s);
+                              setShowUpdateDialog(true);
+                              setMenuOpen(null);
+                            }}
+                            className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100"
+                          >
+                            <img src="public/images/update.svg" alt="update" className="w-4 h-4" />
+                            Update
+                          </button>
+                          <button
+                            onClick={() =>
+                              setShowDeleteDialog({ open: true, id: s.id, name: s.name })
+                            }
+                            className="flex items-center gap-2 w-full px-4 py-2 hover:bg-red-50 text-red-600"
+                          >
+                            <img src="public/images/Delete.svg" alt="delete" className="w-6 h-6" />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Create View */}
+      {view === "create" && (
+        <div className="max-w-2xl mx-0 mt-6 pl-6">
+          <h2 className="text-3xl font-bold mb-10 text-red-600">Create Service</h2>
+          <div className="space-y-6">
+            <input
+              type="text"
+              placeholder="Name"
+              value={newService.name}
+              onChange={(e) => setNewService({ ...newService, name: e.target.value })}
+              className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newService.description}
+              onChange={(e) =>
+                setNewService({ ...newService, description: e.target.value })
+              }
+              className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
+            />
+            <input
+              type="text"
+              placeholder="Squad ID"
+              value={newService.squadId}
+              onChange={(e) =>
+                setNewService({ ...newService, squadId: e.target.value })
+              }
+              className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
+            />
+          </div>
+
+          <div className="mt-8 flex gap-3">
+            <button
+              onClick={handleCreate}
+              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700"
+            >
+              Create
+            </button>
+            <button
+              onClick={() => setView("menu")}
+              className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
