@@ -36,7 +36,6 @@ const Navbar: React.FC<NavbarProps> = ({ userName, userAvatar }) => {
           {/* User name */}
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">{userName}</p>
-            <p className="text-xs text-gray-500">Admin Portal</p>
           </div>
         </div>
       </div>
