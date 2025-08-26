@@ -110,3 +110,63 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Ateko-specific animations and effects */
+@keyframes glow-rotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Menu link hover effects */
+.menu-link-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-link-hover .rotate-text {
+  transition: transform 0.3s ease;
+}
+
+.menu-link-hover:hover .rotate-text {
+  transform: translateY(-100%);
+}
+
+.menu-link-hover .rotate-text.bottom {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+/* Page Wrapper and Background Overlay - Ateko Layout Structure */
+.page-wrapper {
+  position: relative;
+  overflow: clip;
+}
+
+.bg-wrapper {
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  inset: 0%;
+}
+
+.bg-overlay {
+  z-index: -1;
+  opacity: 0.02;
+  background-image: url("https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e10b83fa5b37426335a332_grain_overlay.gif");
+  background-position: 0 0;
+  position: absolute;
+  inset: 0%;
+}
+
+.w-layout-vflex {
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
+}

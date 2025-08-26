@@ -8,10 +8,15 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className='min-h-screen flex flex-col'>
-      <Header />
-      <main className='flex-1 pt-20'>{children}</main>
-      <Footer />
+    <div className='page-wrapper'>
+      <div className='bg-wrapper'>
+        <div className='bg-overlay'></div>
+      </div>
+      <div className='w-layout-vflex min-h-screen flex flex-col'>
+        <Header />
+        <main className='flex-1'>{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 };
