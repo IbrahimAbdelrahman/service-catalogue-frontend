@@ -1,28 +1,50 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import {
+  heroContainer,
+  fadeInLeft,
+  fadeInRight,
+  tagAnimation,
+  strokeAnimation,
+  textReveal,
+  fadeInUp,
+  buttonHover,
+  buttonTap,
+} from "@/utils/animations";
 
 const HeroSection: React.FC = () => {
+  const { ref: heroRef, isInView: heroInView } = useScrollAnimation(0.2);
+
   const handleScrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section id='hero' className='section-hero'>
+    <motion.section
+      id='hero'
+      className='section-hero'
+      ref={heroRef}
+      variants={heroContainer}
+      initial='hidden'
+      animate={heroInView ? "visible" : "hidden"}
+    >
       <div className='w-layout-vflex padding-section-extra-large'>
         <div className='w-layout-vflex padding-global'>
           <div className='container-large'>
             <div className='home-about_action'>
-              <div
+              <motion.div
                 id='w-node-af188d7a-b1fa-aa40-f315-f1aa7d90469e-6335a2bf'
                 data-w-id='af188d7a-b1fa-aa40-f315-f1aa7d90469e'
-                style={{
-                  transform:
-                    "translate3d(13.0392%, -8.8592%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                  opacity: 1,
-                  transformStyle: "preserve-3d",
-                  willChange: "transform",
-                }}
                 className='action_image left'
+                variants={fadeInLeft}
+                whileHover={{
+                  scale: 1.0,
+                  x: "5.8143%",
+                  y: "-6.3708%",
+                  transition: { duration: 0.3 },
+                }}
               >
                 <div className='action_height'>
                   <img
@@ -34,22 +56,19 @@ const HeroSection: React.FC = () => {
                     className='image-cover'
                   />
                 </div>
-              </div>
+              </motion.div>
 
-              <div
+              <motion.div
                 id='w-node-_19e938e7-f5e9-a49d-b400-215de2befbaa-6335a2bf'
                 className='action_content'
+                variants={fadeInUp}
               >
                 <div className='w-layout-vflex action_top'>
-                  <div
+                  <motion.div
                     data-wf--tag--variant='base'
                     data-w-id='055297b7-fac4-0ad7-3526-e431647abfe3'
                     className='tag-wrapper'
-                    style={{
-                      transform:
-                        "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                      opacity: 1,
-                    }}
+                    variants={tagAnimation}
                   >
                     <div className='w-layout-vflex tag'>
                       <div
@@ -60,105 +79,92 @@ const HeroSection: React.FC = () => {
                         AI Consulting Studio
                       </div>
                     </div>
-                    <div
+                    <motion.div
                       className='stroke-wrapper'
-                      style={{
-                        transform:
-                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(356.292deg) skew(0deg, 0deg)",
-                        transformStyle: "preserve-3d",
-                        willChange: "transform",
+                      variants={strokeAnimation}
+                      animate={{
+                        rotate: [0, 360],
+                        transition: {
+                          duration: 4,
+                          ease: "linear",
+                          repeat: Infinity,
+                        },
                       }}
                     >
                       <div
                         data-w-id='6e0e5d9e-df71-2e56-c251-612c91d2a6a3'
                         className='stroke'
                       ></div>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
 
                   <div className='w-layout-vflex clip-content'>
-                    <div
-                      style={{
-                        transform:
-                          "translate3d(0px, 0%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                        opacity: 1,
-                        transformStyle: "preserve-3d",
-                      }}
+                    <motion.div
                       className='w-layout-vflex text-hero'
+                      variants={textReveal}
                     >
                       <h1 className='heading-style-small'>
                         We design intuitive, human-centric AI experiences.
                       </h1>
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
 
                 <div className='w-layout-vflex action_bottom'>
-                  <div
-                    style={{
-                      opacity: 1,
-                      filter: "blur(0px)",
-                      transform:
-                        "translate3d(0px, 0rem, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                      transformStyle: "preserve-3d",
-                    }}
+                  <motion.div
                     className='w-layout-vflex subtitle-hero'
+                    variants={fadeInUp}
                   >
                     <h2 className='heading-style-h4'>
                       We help forward-thinking brands craft intuitive AI
                       interfaces, boost user trust, and scale faster.
                     </h2>
-                  </div>
+                  </motion.div>
 
                   <div className='w-layout-vflex flex-block-4'>
-                    <div
-                      style={{
-                        transform:
-                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                        opacity: 1,
-                        transformStyle: "preserve-3d",
-                      }}
+                    <motion.div
                       className='w-layout-vflex hero_button-primary'
+                      variants={fadeInUp}
+                      whileHover={buttonHover}
+                      whileTap={buttonTap}
                     >
-                      <a
-                        href='#section-contact'
-                        className='button primary w-button'
+                      <Button
+                        className='button primary w-button h-auto'
+                        onClick={() => handleScrollToSection("contact")}
                       >
                         Book a demo
-                      </a>
-                    </div>
+                      </Button>
+                    </motion.div>
 
-                    <div
+                    <motion.div
                       data-w-id='480c34d2-84a1-1b73-aab8-3142b6492cf8'
-                      style={{
-                        transform:
-                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                        opacity: 1,
-                        transformStyle: "preserve-3d",
-                      }}
                       className='w-layout-vflex hero_button-secondary'
+                      variants={fadeInUp}
+                      whileHover={buttonHover}
+                      whileTap={buttonTap}
                     >
-                      <a
-                        href='#section-testimonials'
-                        className='button outline w-button'
+                      <Button
+                        variant='outline'
+                        className='button outline w-button h-auto'
+                        onClick={() => handleScrollToSection("services")}
                       >
                         They trust us
-                      </a>
-                    </div>
+                      </Button>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              <div
+              <motion.div
                 id='w-node-bc13bc38-e126-9d72-530c-33fc1395af20-6335a2bf'
-                style={{
-                  transform:
-                    "translate3d(-13.0392%, 8.8592%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
-                  opacity: 1,
-                  transformStyle: "preserve-3d",
-                  willChange: "transform",
-                }}
                 className='action_image right'
+                variants={fadeInRight}
+                whileHover={{
+                  scale: 1.0,
+                  x: "-24.5442%",
+                  y: "5.0644%",
+                  transition: { duration: 0.3 },
+                }}
               >
                 <div className='action_height'>
                   <img
@@ -170,12 +176,12 @@ const HeroSection: React.FC = () => {
                     className='image-cover'
                   />
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
