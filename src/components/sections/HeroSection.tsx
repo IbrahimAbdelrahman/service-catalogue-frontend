@@ -1,86 +1,178 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const HeroSection: React.FC = () => {
+  const handleScrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <section className='d-flex relative py-20 lg:py-32'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='text-center'>
-          {/* Badge */}
-          <div className='flex justify-center mb-8'>
-            <Badge
-              variant='secondary'
-              className='px-4 py-2 text-sm font-medium'
-            >
-              AI Consulting Studio
-            </Badge>
-          </div>
+    <section id='hero' className='section-hero'>
+      <div className='w-layout-vflex padding-section-extra-large'>
+        <div className='w-layout-vflex padding-global'>
+          <div className='container-large'>
+            <div className='home-about_action'>
+              <div
+                id='w-node-af188d7a-b1fa-aa40-f315-f1aa7d90469e-6335a2bf'
+                data-w-id='af188d7a-b1fa-aa40-f315-f1aa7d90469e'
+                style={{
+                  transform:
+                    "translate3d(13.0392%, -8.8592%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                  opacity: 1,
+                  transformStyle: "preserve-3d",
+                  willChange: "transform",
+                }}
+                className='action_image left'
+              >
+                <div className='action_height'>
+                  <img
+                    src='https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting.jpeg'
+                    loading='lazy'
+                    sizes='(max-width: 2400px) 100vw, 2400px'
+                    srcSet='https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting-p-500.jpeg 500w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting-p-800.jpeg 800w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting-p-1080.jpeg 1080w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting-p-1600.jpeg 1600w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting-p-2000.jpeg 2000w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40d25fbc1edc2cdc38b19_Minimalist%20Office%20Meeting.jpeg 2400w'
+                    alt=''
+                    className='image-cover'
+                  />
+                </div>
+              </div>
 
-          {/* Main Headline */}
-          <h1 className='text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 tracking-tight'>
-            We design intuitive,{" "}
-            <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600'>
-              human-centric
-            </span>{" "}
-            AI experiences.
-          </h1>
+              <div
+                id='w-node-_19e938e7-f5e9-a49d-b400-215de2befbaa-6335a2bf'
+                className='action_content'
+              >
+                <div className='w-layout-vflex action_top'>
+                  <div
+                    data-wf--tag--variant='base'
+                    data-w-id='055297b7-fac4-0ad7-3526-e431647abfe3'
+                    className='tag-wrapper'
+                    style={{
+                      transform:
+                        "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                      opacity: 1,
+                    }}
+                  >
+                    <div className='w-layout-vflex tag'>
+                      <div
+                        data-w-id='055297b7-fac4-0ad7-3526-e431647abfe4'
+                        className='text-size-small text-color-aqua-pastel'
+                        style={{ display: "block" }}
+                      >
+                        AI Consulting Studio
+                      </div>
+                    </div>
+                    <div
+                      className='stroke-wrapper'
+                      style={{
+                        transform:
+                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(356.292deg) skew(0deg, 0deg)",
+                        transformStyle: "preserve-3d",
+                        willChange: "transform",
+                      }}
+                    >
+                      <div
+                        data-w-id='6e0e5d9e-df71-2e56-c251-612c91d2a6a3'
+                        className='stroke'
+                      ></div>
+                    </div>
+                  </div>
 
-          {/* Subtitle */}
-          <p className='text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed'>
-            We help forward-thinking brands craft intuitive AI interfaces, boost
-            user trust, and scale faster.
-          </p>
+                  <div className='w-layout-vflex clip-content'>
+                    <div
+                      style={{
+                        transform:
+                          "translate3d(0px, 0%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        opacity: 1,
+                        transformStyle: "preserve-3d",
+                      }}
+                      className='w-layout-vflex text-hero'
+                    >
+                      <h1 className='heading-style-small'>
+                        We design intuitive, human-centric AI experiences.
+                      </h1>
+                    </div>
+                  </div>
+                </div>
 
-          {/* CTA Buttons */}
-          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
-            <Button
-              size='lg'
-              className='bg-black text-white hover:bg-gray-800 px-8 py-4 text-lg'
-              onClick={() =>
-                document
-                  .getElementById("contact")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Book a demo
-            </Button>
-            <Button
-              size='lg'
-              variant='outline'
-              className='px-8 py-4 text-lg'
-              onClick={() =>
-                document
-                  .getElementById("services")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Explore services
-            </Button>
-          </div>
+                <div className='w-layout-vflex action_bottom'>
+                  <div
+                    style={{
+                      opacity: 1,
+                      filter: "blur(0px)",
+                      transform:
+                        "translate3d(0px, 0rem, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                      transformStyle: "preserve-3d",
+                    }}
+                    className='w-layout-vflex subtitle-hero'
+                  >
+                    <h2 className='heading-style-h4'>
+                      We help forward-thinking brands craft intuitive AI
+                      interfaces, boost user trust, and scale faster.
+                    </h2>
+                  </div>
 
-          {/* Trust indicators */}
-          <div className='mt-16'>
-            <p className='text-sm text-gray-500 mb-6'>
-              Trusted by companies in 100+ countries around the globe.
-            </p>
-            <div className='flex justify-center items-center space-x-8 opacity-60'>
-              {/* Placeholder for company logos */}
-              <div className='h-8 w-24 bg-gray-200 rounded'></div>
-              <div className='h-8 w-24 bg-gray-200 rounded'></div>
-              <div className='h-8 w-24 bg-gray-200 rounded'></div>
-              <div className='h-8 w-24 bg-gray-200 rounded'></div>
-              <div className='h-8 w-24 bg-gray-200 rounded'></div>
+                  <div className='w-layout-vflex flex-block-4'>
+                    <div
+                      style={{
+                        transform:
+                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        opacity: 1,
+                        transformStyle: "preserve-3d",
+                      }}
+                      className='w-layout-vflex hero_button-primary'
+                    >
+                      <a
+                        href='#section-contact'
+                        className='button primary w-button'
+                      >
+                        Book a demo
+                      </a>
+                    </div>
+
+                    <div
+                      data-w-id='480c34d2-84a1-1b73-aab8-3142b6492cf8'
+                      style={{
+                        transform:
+                          "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        opacity: 1,
+                        transformStyle: "preserve-3d",
+                      }}
+                      className='w-layout-vflex hero_button-secondary'
+                    >
+                      <a
+                        href='#section-testimonials'
+                        className='button outline w-button'
+                      >
+                        They trust us
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                id='w-node-bc13bc38-e126-9d72-530c-33fc1395af20-6335a2bf'
+                style={{
+                  transform:
+                    "translate3d(-13.0392%, 8.8592%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                  opacity: 1,
+                  transformStyle: "preserve-3d",
+                  willChange: "transform",
+                }}
+                className='action_image right'
+              >
+                <div className='action_height'>
+                  <img
+                    src='https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop.jpeg'
+                    loading='lazy'
+                    sizes='(max-width: 2400px) 100vw, 2400px'
+                    srcSet='https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop-p-500.jpeg 500w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop-p-800.jpeg 800w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop-p-1080.jpeg 1080w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop-p-1600.jpeg 1600w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop-p-2000.jpeg 2000w, https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e40c64e3b478e0da258ad1_Person%20in%20Orange%20Beanie%20Working%20on%20Laptop.jpeg 2400w'
+                    alt=''
+                    className='image-cover'
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Decorative elements */}
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10'>
-          <div className='w-96 h-96 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full blur-3xl opacity-30'></div>
-        </div>
-        <div className='absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 -z-10'>
-          <div className='w-64 h-64 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full blur-2xl opacity-40'></div>
         </div>
       </div>
     </section>

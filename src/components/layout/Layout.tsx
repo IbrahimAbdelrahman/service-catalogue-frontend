@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
       <div className='w-layout-vflex min-h-screen flex flex-col'>
         <Header />
-        <main className='flex-1'>{children}</main>
+        <main className='w-full'>{children}</main>
         <Footer />
       </div>
     </div>
