@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
   return (
     <aside className="w-64 bg-gray-50 border-r border-gray-200 h-full">
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Navigation</h2>
+        {/* Navigation Menu */}
         <nav className="space-y-2">
           {menuItems.map((item) => (
             <button

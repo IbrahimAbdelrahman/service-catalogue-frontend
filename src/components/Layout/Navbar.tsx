@@ -18,7 +18,7 @@ const Navbar: React.FC<NavbarProps> = ({ userName, userAvatar }) => {
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-l font-semibold text-red-600">
             Service Catalogue
           </h1>
         </div>
@@ -36,7 +36,6 @@ const Navbar: React.FC<NavbarProps> = ({ userName, userAvatar }) => {
           {/* User name */}
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">{userName}</p>
-            <p className="text-xs text-gray-500">Admin Portal</p>
           </div>
         </div>
       </div>
