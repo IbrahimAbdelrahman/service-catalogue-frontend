@@ -54,7 +54,7 @@ const SquadList: React.FC = () => {
 
   const baseUrl = "https://localhost:44374/api/Squad";
   const teamUrl = "https://localhost:44374/api/Team/names";
-  const memberUrl = "https://localhost:44374/api/Member/names";
+  const memberUrl = "https://localhost:44374/api/Member/available-leaders";
 
   // Fetch squads
   const fetchSquads = async () => {
@@ -164,21 +164,29 @@ const SquadList: React.FC = () => {
     }
   };
 
-  // Create new squad
-  const handleCreate = async () => {
-    try {
-      await fetch(baseUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSquad),
-      });
-      alert("✅ Squad created successfully!");
-      setNewSquad({ name: "", description: "", teamId: "", leaderId: "" });
-      setView("menu");
-    } catch (err) {
-      console.error("Create failed:", err);
-    }
-  };
+
+// Create new squad
+// Create new squad
+const handleCreate = async () => {
+  try {
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newSquad),
+    });
+
+    if (!res.ok) throw new Error("Failed to create squad");
+
+    setMessageDialog({ open: true, text: "✅ Squad created successfully!" });
+    setNewSquad({ name: "", description: "", teamId: "", leaderId: "" });
+    setView("menu");
+  } catch (err) {
+    console.error("Create failed:", err);
+    setMessageDialog({ open: true, text: "❌ Failed to create squad." });
+  }
+};
+
+
 
   return (
     <div className="p-6">
@@ -527,21 +535,21 @@ const SquadList: React.FC = () => {
         Cancel
       </button>
     </div>
+{/* ✅ Message Dialog */}
+{messageDialog.open && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+      <p className="text-gray-800 mb-4">{messageDialog.text}</p>
+      <button
+        onClick={() => setMessageDialog({ open: false, text: "" })}
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
 
-    {/* ✅ Message Dialog */}
-    {messageDialog.open && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-          <p className="text-gray-800 mb-4">{messageDialog.text}</p>
-          <button
-            onClick={() => setMessageDialog({ open: false, text: "" })}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    )}
   </div>
 )}
 
