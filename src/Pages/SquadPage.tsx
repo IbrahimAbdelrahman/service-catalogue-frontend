@@ -6,10 +6,25 @@ interface Squad {
   description: string;
   teamId: string;
   leaderId: string;
+  teamName: string;
+  leaderName: string;
+}
+
+interface DisplayTeam {
+  id: string;
+  name: string;
+}
+
+interface DisplayMember {
+  id: string;
+  name: string;
 }
 
 const SquadList: React.FC = () => {
   const [squads, setSquads] = useState<Squad[]>([]);
+  const [teams, setTeams] = useState<DisplayTeam[]>([]);
+  const [members, setMembers] = useState<DisplayMember[]>([]);
+
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [editRow, setEditRow] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Squad>>({});
@@ -38,6 +53,8 @@ const SquadList: React.FC = () => {
   }>({ open: false, text: "" });
 
   const baseUrl = "https://localhost:44374/api/Squad";
+  const teamUrl = "https://localhost:44374/api/Team/names";
+  const memberUrl = "https://localhost:44374/api/Member/names";
 
   // Fetch squads
   const fetchSquads = async () => {
@@ -50,19 +67,51 @@ const SquadList: React.FC = () => {
     }
   };
 
+  // Fetch teams
+  const fetchTeams = async () => {
+    try {
+      const res = await fetch(teamUrl);
+      const data = await res.json();
+      setTeams(data);
+    } catch (err) {
+      console.error("Error fetching teams:", err);
+    }
+  };
+
+  // Fetch members
+  const fetchMembers = async () => {
+    try {
+      const res = await fetch(memberUrl);
+      const data = await res.json();
+      setMembers(data);
+    } catch (err) {
+      console.error("Error fetching members:", err);
+    }
+  };
+
+  // Load teams & members when creating or updating
+  useEffect(() => {
+    if (view === "create" || showUpdateDialog) {
+      fetchTeams();
+      fetchMembers();
+    }
+  }, [view, showUpdateDialog]);
+
   // Delete squad
   const handleDelete = async (id: string) => {
     try {
       const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        throw new Error("Failed to delete squad.");
-      }
+      if (!res.ok) throw new Error("Failed to delete squad.");
+
       setSquads(squads.filter((s) => s.id !== id));
       setShowDeleteDialog({ open: false });
       setMessageDialog({ open: true, text: "✅ Squad deleted successfully!" });
     } catch (err) {
       console.error("Delete failed:", err);
-      setMessageDialog({ open: true, text: "❌ Error deleting squad. Please try again." });
+      setMessageDialog({
+        open: true,
+        text: "❌ Error deleting squad. Please try again.",
+      });
     }
   };
 
@@ -75,9 +124,7 @@ const SquadList: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedSquad),
       });
-      if (!res.ok) {
-        throw new Error("Failed to update squad.");
-      }
+      if (!res.ok) throw new Error("Failed to update squad.");
 
       setSquads(
         squads.map((s) =>
@@ -90,7 +137,10 @@ const SquadList: React.FC = () => {
       setMessageDialog({ open: true, text: "✅ Squad updated successfully!" });
     } catch (err) {
       console.error("Update failed:", err);
-      setMessageDialog({ open: true, text: "❌ Error updating squad. Please try again." });
+      setMessageDialog({
+        open: true,
+        text: "❌ Error updating squad. Please try again.",
+      });
     }
   };
 
@@ -145,7 +195,9 @@ const SquadList: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4 text-red-600">Update Squad</h2>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
             <input
               type="text"
               value={editData.name || ""}
@@ -156,7 +208,9 @@ const SquadList: React.FC = () => {
               className="p-2 rounded w-full mb-2 border border-gray-300"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
             <input
               type="text"
               value={editData.description || ""}
@@ -167,27 +221,43 @@ const SquadList: React.FC = () => {
               className="p-2 rounded w-full mb-2 border border-gray-300"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
-            <input
-              type="text"
+            {/* ✅ Team Dropdown */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Team
+            </label>
+            <select
               value={editData.teamId || ""}
               onChange={(e) =>
                 setEditData({ ...editData, teamId: e.target.value })
               }
-              placeholder="Team ID"
               className="p-2 rounded w-full mb-2 border border-gray-300"
-            />
+            >
+              <option value="">Select Team</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Leader Name</label>
-            <input
-              type="text"
+            {/* ✅ Leader Dropdown */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Leader
+            </label>
+            <select
               value={editData.leaderId || ""}
               onChange={(e) =>
                 setEditData({ ...editData, leaderId: e.target.value })
               }
-              placeholder="Leader ID"
               className="p-2 rounded w-full mb-4 border border-gray-300"
-            />
+            >
+              <option value="">Select Leader</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
 
             <div className="flex justify-end gap-2">
               <button
@@ -262,11 +332,7 @@ const SquadList: React.FC = () => {
             }}
             className="flex flex-col items-center bg-white text-red-600 border border-red-600 px-10 py-8 rounded-2xl shadow-xl hover:bg-red-600 hover:text-white transition-all duration-200"
           >
-            <img
-              src="public/images/list.svg"
-              alt="list"
-              className="w-38 h-38"
-            />
+            <img src="public/images/list.svg" alt="list" className="w-38 h-38" />
             <span className="mt-4 text-lg font-bold">List All Squads</span>
           </button>
 
@@ -301,11 +367,6 @@ const SquadList: React.FC = () => {
               onClick={handleSearch}
               className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2"
             >
-              {/* <img
-                src="public/images/Search.svg"
-                alt="search"
-                className="w-8 h-8"
-              /> */}
               Search
             </button>
           </div>
@@ -332,8 +393,8 @@ const SquadList: React.FC = () => {
                       {squad.name}
                     </td>
                     <td className="px-6 py-4">{squad.description}</td>
-                    <td className="px-6 py-4">{squad.teamId}</td>
-                    <td className="px-6 py-4">{squad.leaderId}</td>
+                    <td className="px-6 py-4">{squad.teamName}</td>
+                    <td className="px-6 py-4">{squad.leaderName}</td>
                     <td className="px-6 py-4 text-center relative">
                       <button
                         onClick={() =>
@@ -389,14 +450,12 @@ const SquadList: React.FC = () => {
         </div>
       )}
 
-    {/* Create View */}
+{/* Create View */}
 {view === "create" && (
-  <div className="max-w-2xl mx-0 mt-6 pl-6"> {/* aligned left with padding */}
-    <h2 className="text-3xl font-bold mb-10 text-red-600">
-      Create Squad
-    </h2> {/* larger + more space below */}
-    
-    <div className="space-y-6"> {/* spacing between inputs */}
+  <div className="max-w-2xl mx-0 mt-6 pl-6">
+    <h2 className="text-3xl font-bold mb-10 text-red-600">Create Squad</h2>
+
+    <div className="space-y-6">
       <input
         type="text"
         placeholder="Name"
@@ -413,26 +472,47 @@ const SquadList: React.FC = () => {
         }
         className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
       />
-      <input
-        type="text"
-        placeholder="Team Name"
+
+      {/* ✅ Team Dropdown */}
+      <select
         value={newSquad.teamId}
-        onChange={(e) =>
-          setNewSquad({ ...newSquad, teamId: e.target.value })
-        }
-        className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
-      />
-      <input
-        type="text"
-        placeholder="Leader Name"
+        onChange={(e) => setNewSquad({ ...newSquad, teamId: e.target.value })}
+        className="w-96 p-4 rounded-lg shadow-md focus:outline-none bg-white"
+      >
+        <option value="">Select Team</option>
+        {teams.map((team) => (
+          <option
+            key={team.id}
+            value={team.id}
+            className="whitespace-normal break-words"
+          >
+            {team.name}
+          </option>
+        ))}
+      </select>
+
+      {/* ✅ Leader Dropdown */}
+      <select
         value={newSquad.leaderId}
         onChange={(e) =>
           setNewSquad({ ...newSquad, leaderId: e.target.value })
         }
-        className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
-      />
+        className="w-96 p-4 rounded-lg shadow-md focus:outline-none bg-white mt-4"
+      >
+        <option value="">Select Leader</option>
+        {members.map((member) => (
+          <option
+            key={member.id}
+            value={member.id}
+            className="whitespace-normal break-words"
+          >
+            {member.name}
+          </option>
+        ))}
+      </select>
     </div>
 
+    {/* Action Buttons */}
     <div className="mt-8 flex gap-3">
       <button
         onClick={handleCreate}
@@ -447,10 +527,24 @@ const SquadList: React.FC = () => {
         Cancel
       </button>
     </div>
+
+    {/* ✅ Message Dialog */}
+    {messageDialog.open && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+          <p className="text-gray-800 mb-4">{messageDialog.text}</p>
+          <button
+            onClick={() => setMessageDialog({ open: false, text: "" })}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
-      
     </div>
   );
 };
