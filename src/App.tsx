@@ -5,6 +5,7 @@ import TeamPage from "./Pages/TeamPage";
 import SquadPage from "./Pages/SquadPage";
 import ServicePage from "./Pages/ServicePage";
 import MemberPage from "./Pages/MemberPage"
+import ProjectPage from "./Pages/ProjectPage";
 
 function App() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -21,7 +22,7 @@ function App() {
         return <SquadPage />;
 
       case "projects":
-        return <h1>Projects Page</h1>;
+        return <ProjectPage />;
       case "services":
         return <ServicePage />;
       case "members":
