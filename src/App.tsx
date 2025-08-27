@@ -3,7 +3,7 @@ import MainLayout from "./components/Layout/MainLayout";
 import DashboardContent from "./components/Dashboard/DashboardContent";
 import TeamPage from "./Pages/TeamPage";
 import SquadPage from "./Pages/SquadPage";
-
+import MemberPage from "./Pages/MemberPage"
 
 function App() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -24,7 +24,7 @@ function App() {
       case "services":
         return <h1>Services Page</h1>;
       case "members":
-        return <h1>Members Page</h1>;
+        return <MemberPage />;
       default:
         return <DashboardContent />;
     }
