@@ -24,7 +24,7 @@ const SquadList: React.FC = () => {
   const [squads, setSquads] = useState<Squad[]>([]);
   const [teams, setTeams] = useState<DisplayTeam[]>([]);
   const [members, setMembers] = useState<DisplayMember[]>([]);
-
+  const [searchName, setSearchName] = useState<string>("");
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [editRow, setEditRow] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Squad>>({});
@@ -59,7 +59,11 @@ const SquadList: React.FC = () => {
   // Fetch squads
   const fetchSquads = async () => {
     try {
-      const res = await fetch(baseUrl);
+      const url = searchName.trim()
+      ? `${baseUrl}?search=${encodeURIComponent(searchName)}`
+      : baseUrl;
+
+      const res = await fetch(url);
       const data = await res.json();
       setSquads(data);
     } catch (err) {
@@ -144,25 +148,6 @@ const SquadList: React.FC = () => {
     }
   };
 
-  // Search squad by ID
-  const handleSearch = async () => {
-    if (!searchId.trim()) {
-      alert("Please enter a Squad ID to search.");
-      return;
-    }
-    try {
-      const res = await fetch(`${baseUrl}/${searchId}`);
-      if (!res.ok) {
-        alert("❌ Squad not found");
-        return;
-      }
-      const squad: Squad = await res.json();
-      alert(`✅ Squad "${squad.name}" found!`);
-    } catch (err) {
-      console.error("Search failed:", err);
-      alert("❌ Error searching for squad");
-    }
-  };
 
 
 // Create new squad
@@ -188,6 +173,13 @@ const handleCreate = async () => {
 
 
 
+    useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchSquads();
+    }, 100); // wait 100ms after typing
+  
+    return () => clearTimeout(delayDebounce);
+  }, [searchName]);
   return (
     <div className="p-6">
       {/* ✅ Title */}
@@ -366,17 +358,11 @@ const handleCreate = async () => {
           <div className="mb-4 flex items-center gap-2">
             <input
               type="text"
-              placeholder="Search By Squad Name"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-              className="p-2 rounded w-1/3 bg-gray-100 focus:outline-none"
+              placeholder="Search By Service Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              className="p-2 rounded w-1/3 bg-gray-100"
             />
-            <button
-              onClick={handleSearch}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2"
-            >
-              Search
-            </button>
           </div>
 
           {/* Squad table */}
