@@ -11,6 +11,7 @@ const TeamPage: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [searchId, setSearchId] = useState<string>("");
   const [view, setView] = useState<"menu" | "list" | "create">("menu");
+  const [searchName, setSearchName] = useState<string>("");
   const [newTeam, setNewTeam] = useState<Partial<Team>>({
     name: "",
     description: "",
@@ -27,13 +28,25 @@ const TeamPage: React.FC = () => {
   // Fetch teams
   const fetchTeams = async () => {
     try {
-      const res = await fetch(baseUrl);
+      const url = searchName.trim()
+      ? `${baseUrl}?search=${encodeURIComponent(searchName)}`
+      : baseUrl;
+
+      const res = await fetch(url);
       const data = await res.json();
       setTeams(data);
     } catch (err) {
       console.error("Error fetching teams:", err);
     }
   };
+
+      useEffect(() => {
+      const delayDebounce = setTimeout(() => {
+        fetchTeams();
+      }, 100); // wait 100ms after typing
+    
+      return () => clearTimeout(delayDebounce);
+    }, [searchName]);
 
   // Delete team
   const handleDelete = async () => {
@@ -71,25 +84,6 @@ const TeamPage: React.FC = () => {
     }
   };
 
-  // Search team by ID
-  const handleSearch = async () => {
-    if (!searchId.trim()) {
-      alert("Please enter a Team ID to search.");
-      return;
-    }
-    try {
-      const res = await fetch(`${baseUrl}/${searchId}`);
-      if (!res.ok) {
-        alert("❌ Team not found");
-        return;
-      }
-      const team: Team = await res.json();
-      alert(`✅ Team "${team.name}" found!`);
-    } catch (err) {
-      console.error("Search failed:", err);
-      alert("❌ Error searching for team");
-    }
-  };
 
   // Create new team
   const handleCreate = async () => {
@@ -149,25 +143,18 @@ const TeamPage: React.FC = () => {
           <div className="mb-4 flex items-center gap-2">
             <input
               type="text"
-              placeholder="Search by Team Name"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-              className="border p-2 rounded w-1/3"
+              placeholder="Search By Service Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              className="p-2 rounded w-1/3 bg-gray-100"
             />
-            <button
-              onClick={handleSearch}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2"
-            >
-              <img src="public/images/search.svg" alt="search" className="w-8 h-8" />
-              Search
-            </button>
           </div>
 
           {/* Team table */}
           <table className="w-full text-sm text-left text-gray-600">
             <thead>
               <tr className="bg-gray-100 text-gray-500 text-xs uppercase">
-                <th className="px-6 py-3">ID</th>
+                
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Description</th>
                 <th className="px-6 py-3 text-center">Actions</th>
@@ -180,7 +167,7 @@ const TeamPage: React.FC = () => {
                   key={team.id}
                   className="hover:bg-gray-50 transition-colors duration-200"
                 >
-                  <td className="px-6 py-4 font-medium text-gray-800">{team.id}</td>
+                  
                   <td className="px-6 py-4 font-semibold text-gray-800">{team.name}</td>
                   <td className="px-6 py-4">{team.description}</td>
                   <td className="px-6 py-4 text-center relative">

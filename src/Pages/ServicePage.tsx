@@ -137,7 +137,7 @@ const handleUpdate = async (id: string) => {
   useEffect(() => {
   const delayDebounce = setTimeout(() => {
     fetchServices();
-  }, 100); // wait 400ms after typing
+  }, 100); // wait 100ms after typing
 
   return () => clearTimeout(delayDebounce);
 }, [searchName]);
