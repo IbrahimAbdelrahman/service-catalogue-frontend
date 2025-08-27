@@ -3,7 +3,9 @@ import MainLayout from "./components/Layout/MainLayout";
 import DashboardContent from "./components/Dashboard/DashboardContent";
 import TeamPage from "./Pages/TeamPage";
 import SquadPage from "./Pages/SquadPage";
-
+import ServicePage from "./Pages/ServicePage";
+import MemberPage from "./Pages/MemberPage"
+import ProjectPage from "./Pages/ProjectPage";
 
 function App() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -20,11 +22,11 @@ function App() {
         return <SquadPage />;
 
       case "projects":
-        return <h1>Projects Page</h1>;
+        return <ProjectPage />;
       case "services":
-        return <h1>Services Page</h1>;
+        return <ServicePage />;
       case "members":
-        return <h1>Members Page</h1>;
+        return <MemberPage />;
       default:
         return <DashboardContent />;
     }

@@ -1,7 +1,6 @@
-import React from 'react';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
-
+import React from "react";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -12,9 +11,7 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ 
   children, 
-
-  userName = 'Admin User',
-
+  userName = "Admin User",
   activeItem,
   onItemClick
 }) => {
@@ -29,7 +26,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           activeItem={activeItem} 
           onItemClick={onItemClick} 
         />
-
 
         {/* Main Content Area */}
 
