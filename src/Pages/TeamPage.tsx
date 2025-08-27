@@ -5,7 +5,7 @@ interface Team {
   name: string;
   description: string;
   leaderId: string;
-  leaderName?: string; // optional for display in list
+  leaderName?: string;
 }
 
 interface DisplayMember {
@@ -24,16 +24,27 @@ const TeamPage: React.FC = () => {
     leaderId: "",
   });
 
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [editData, setEditData] = useState<Partial<Team>>({});
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [editRow, setEditRow] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<Team>>({});
+
+  // dialogs
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<{
+    open: boolean;
+    id?: string;
+    name?: string;
+  }>({ open: false });
+
+  const [messageDialog, setMessageDialog] = useState<{
+    open: boolean;
+    text: string;
+  }>({ open: false, text: "" });
 
   const baseUrl = "https://localhost:44374/api/Team";
   const memberUrl = "https://localhost:44374/api/Member/names";
 
-  // Fetch members for dropdown
+  // Fetch members
   const fetchMembers = async () => {
     try {
       const res = await fetch(memberUrl);
@@ -44,7 +55,7 @@ const TeamPage: React.FC = () => {
     }
   };
 
-  // Fetch teams for list
+  // Fetch teams
   const fetchTeams = async () => {
     try {
       const url = searchName.trim()
@@ -63,12 +74,11 @@ const TeamPage: React.FC = () => {
     return () => clearTimeout(delay);
   }, [searchName]);
 
-  // Fetch members when creating or editing
   useEffect(() => {
-    if (view === "create" || editDialogOpen) fetchMembers();
-  }, [view, editDialogOpen]);
+    if (view === "create" || showUpdateDialog) fetchMembers();
+  }, [view, showUpdateDialog]);
 
-  // Create new team
+  // Create
   const handleCreate = async () => {
     try {
       await fetch(baseUrl, {
@@ -76,47 +86,62 @@ const TeamPage: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTeam),
       });
-      alert("✅ Team created successfully!");
+      setMessageDialog({ open: true, text: "✅ Team created successfully!" });
       setNewTeam({ name: "", description: "", leaderId: "" });
       setView("menu");
     } catch (err) {
       console.error("Create failed:", err);
+      setMessageDialog({ open: true, text: "❌ Error creating team." });
     }
   };
 
-  // Update team
-  const handleUpdate = async () => {
-    if (!selectedTeam) return;
+  // Update
+  const handleUpdate = async (id: string) => {
     try {
-      const updatedTeam = { ...editData, id: selectedTeam.id };
-      await fetch(baseUrl, {
+      const updatedTeam = { ...editData };
+      const res = await fetch(`${baseUrl}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedTeam),
       });
+
+      if (!res.ok) throw new Error("Failed to update team.");
+
       setTeams(
         teams.map((t) =>
-          t.id === selectedTeam.id ? { ...t, ...editData } : t
+          t.id === id
+            ? {
+                ...t,
+                ...editData,
+                leaderName:
+                  members.find((m) => m.id === editData.leaderId)?.name || "",
+              }
+            : t
         )
       );
-      setEditDialogOpen(false);
+
+      setEditRow(null);
       setEditData({});
-      setSelectedTeam(null);
+      setShowUpdateDialog(false);
+      setMessageDialog({ open: true, text: "✅ Team updated successfully!" });
     } catch (err) {
       console.error("Update failed:", err);
+      setMessageDialog({ open: true, text: "❌ Error updating team." });
     }
   };
 
-  // Delete team
-  const handleDelete = async () => {
-    if (!selectedTeam) return;
+  // Delete
+  const handleDelete = async (id: string) => {
     try {
-      await fetch(`${baseUrl}/${selectedTeam.id}`, { method: "DELETE" });
-      setTeams(teams.filter((t) => t.id !== selectedTeam.id));
-      setDeleteDialogOpen(false);
-      setSelectedTeam(null);
+      const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete team.");
+
+      setTeams(teams.filter((t) => t.id !== id));
+      setShowDeleteDialog({ open: false });
+      setMessageDialog({ open: true, text: "✅ Team deleted successfully!" });
     } catch (err) {
       console.error("Delete failed:", err);
+      setMessageDialog({ open: true, text: "❌ Error deleting team." });
     }
   };
 
@@ -126,6 +151,105 @@ const TeamPage: React.FC = () => {
         <h1 className="text-2xl font-bold text-red-600 mb-6">
           Team Management
         </h1>
+      )}
+
+      {/* Update Dialog */}
+      {showUpdateDialog && editRow && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Update Team</h2>
+
+            <input
+              type="text"
+              value={editData.name || ""}
+              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+              className="p-2 rounded w-full mb-2 border"
+              placeholder="Name"
+            />
+
+            <input
+              type="text"
+              value={editData.description || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, description: e.target.value })
+              }
+              className="p-2 rounded w-full mb-2 border"
+              placeholder="Description"
+            />
+
+            <select
+              value={editData.leaderId || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, leaderId: e.target.value })
+              }
+              className="p-2 rounded w-full mb-4 border"
+            >
+              <option value="">Select Leader</option>
+              {members.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => handleUpdate(editRow)}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setShowUpdateDialog(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Dialog */}
+      {showDeleteDialog.open && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+            <h2 className="text-lg font-bold text-red-600 mb-4">Confirm Delete</h2>
+            <p>
+              Are you sure you want to delete team{" "}
+              <span className="font-semibold">{showDeleteDialog.name}</span>?
+            </p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => handleDelete(showDeleteDialog.id!)}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setShowDeleteDialog({ open: false })}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Message Dialog */}
+      {messageDialog.open && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
+            <p className="mb-4">{messageDialog.text}</p>
+            <button
+              onClick={() => setMessageDialog({ open: false, text: "" })}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              OK
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Menu */}
@@ -186,46 +310,41 @@ const TeamPage: React.FC = () => {
                     {members.find((m) => m.id === team.leaderId)?.name || ""}
                   </td>
                   <td className="px-6 py-4 text-center relative">
-                    <button
-                      onClick={() =>
-                        setMenuOpen(menuOpen === team.id ? null : team.id)
-                      }
-                      className="p-2 rounded-full hover:bg-gray-200 transition"
-                    >
-                      ⋮
-                    </button>
-
+                    <img
+                      src="public/images/menu.svg"
+                      alt="menu"
+                      className="w-6 h-6 cursor-pointer"
+                      onClick={() => setMenuOpen(menuOpen === team.id ? null : team.id)}
+                    />
                     {menuOpen === team.id && (
-                      <div className="absolute right-0 mt-2 w-40 bg-white border rounded-xl shadow-lg z-50 overflow-hidden">
+                      <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg z-50">
                         <button
                           onClick={() => {
-                            setSelectedTeam(team);
+                            setEditRow(team.id);
                             setEditData(team);
-                            setEditDialogOpen(true);
+                            setShowUpdateDialog(true);
                             setMenuOpen(null);
                           }}
-                          className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100"
+                          className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100"
                         >
                           <img
                             src="public/images/update.svg"
                             alt="update"
                             className="w-4 h-4"
-                          />{" "}
+                          />
                           Update
                         </button>
                         <button
-                          onClick={() => {
-                            setSelectedTeam(team);
-                            setDeleteDialogOpen(true);
-                            setMenuOpen(null);
-                          }}
-                          className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-red-50 text-red-600"
+                          onClick={() =>
+                            setShowDeleteDialog({ open: true, id: team.id, name: team.name })
+                          }
+                          className="flex items-center gap-2 w-full px-4 py-2 hover:bg-red-50 text-red-600"
                         >
                           <img
                             src="public/images/Delete.svg"
                             alt="delete"
                             className="w-6 h-6"
-                          />{" "}
+                          />
                           Delete
                         </button>
                       </div>
@@ -238,7 +357,7 @@ const TeamPage: React.FC = () => {
         </div>
       )}
 
-      {/* Create Team */}
+      {/* Create View */}
       {view === "create" && (
         <div className="max-w-2xl mx-0 mt-6 pl-6">
           <h2 className="text-3xl font-bold mb-10 text-red-600">Create Team</h2>
@@ -284,85 +403,6 @@ const TeamPage: React.FC = () => {
             >
               Cancel
             </button>
-          </div>
-        </div>
-      )}
-
-
-      {/* Update Team Dialog */}
-      {editDialogOpen && selectedTeam && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-96 space-y-4">
-            <h2 className="text-xl font-bold mb-2 text-red-600">Update Team</h2>
-            <input
-              type="text"
-              value={editData.name || ""}
-              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-              className="w-full p-3 rounded-lg border border-gray-300 shadow-sm"
-              placeholder="Name"
-            />
-            <input
-              type="text"
-              value={editData.description || ""}
-              onChange={(e) =>
-                setEditData({ ...editData, description: e.target.value })
-              }
-              className="w-full p-3 rounded-lg border border-gray-300 shadow-sm"
-              placeholder="Description"
-            />
-            <select
-              value={editData.leaderId || ""}
-              onChange={(e) => setEditData({ ...editData, leaderId: e.target.value })}
-              className="w-full p-3 rounded-lg border border-gray-300 shadow-sm bg-white"
-            >
-              <option value="">Select Leader</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setEditDialogOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Dialog */}
-      {deleteDialogOpen && selectedTeam && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
-            <h2 className="text-lg font-bold text-red-600 mb-4">Confirm Delete</h2>
-            <p className="mb-6">
-              Are you sure you want to delete team{" "}
-              <span className="font-semibold">{selectedTeam.name}</span>?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setDeleteDialogOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
           </div>
         </div>
       )}
