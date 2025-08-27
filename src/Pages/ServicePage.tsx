@@ -15,6 +15,7 @@ const ServicePage: React.FC = () => {
   const [editData, setEditData] = useState<Partial<Service>>({});
   const [searchName, setSearchName] = useState<string>("");
   const [view, setView] = useState<"menu" | "list" | "create">("menu");
+  const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
   const [newService, setNewService] = useState<Partial<Service>>({
     name: "",
     description: "",
@@ -51,6 +52,21 @@ const ServicePage: React.FC = () => {
     }
   };
 
+  //Displaying the Squad names
+  useEffect(() => {
+  const fetchSquads = async () => {
+    try {
+      const res = await fetch("https://localhost:44374/api/squad/names");
+      const data = await res.json();
+      setSquads(data);
+    } catch (err) {
+      console.error("Error fetching squads:", err);
+    }
+  };
+
+  fetchSquads();
+}, []);
+
   // Delete service
   const handleDelete = async (id: string) => {
     try {
@@ -80,9 +96,16 @@ const handleUpdate = async (id: string) => {
 
     setServices(
       services.map((s) =>
-        s.id === id ? ({ ...s, ...editData } as Service) : s
+        s.id === id
+          ? {
+              ...s,
+              ...editData,
+              squadName: squads.find((sq) => sq.id === editData.squadId)?.name || "",
+            }
+          : s
       )
     );
+
     setEditRow(null);
     setEditData({});
     setShowUpdateDialog(false);
@@ -114,7 +137,7 @@ const handleUpdate = async (id: string) => {
   useEffect(() => {
   const delayDebounce = setTimeout(() => {
     fetchServices();
-  }, 400); // wait 400ms after typing
+  }, 100); // wait 400ms after typing
 
   return () => clearTimeout(delayDebounce);
 }, [searchName]);
@@ -153,13 +176,20 @@ const handleUpdate = async (id: string) => {
               className="p-2 rounded w-full mb-2 border"
             />
 
-            <label className="block text-sm font-medium mb-1">Squad ID</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium mb-1">Squad Name</label>
+            <select
               value={editData.squadId || ""}
               onChange={(e) => setEditData({ ...editData, squadId: e.target.value })}
               className="p-2 rounded w-full mb-4 border"
-            />
+            >
+              <option value="">Select Squad</option>
+              {squads.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+
 
             <div className="flex justify-end gap-2">
               <button
@@ -339,15 +369,21 @@ const handleUpdate = async (id: string) => {
               }
               className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
             />
-            <input
-              type="text"
-              placeholder="Squad ID"
+            <select
               value={newService.squadId}
               onChange={(e) =>
                 setNewService({ ...newService, squadId: e.target.value })
               }
               className="w-96 p-4 rounded-lg shadow-md focus:outline-none"
-            />
+            >
+              <option value="">Select Squad</option>
+              {squads.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+
           </div>
 
           <div className="mt-8 flex gap-3">
