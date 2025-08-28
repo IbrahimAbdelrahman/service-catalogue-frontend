@@ -42,7 +42,7 @@ const TeamPage: React.FC = () => {
   }>({ open: false, text: "" });
 
   const baseUrl = "https://localhost:44374/api/Team";
-  const memberUrl = "https://localhost:44374/api/Member/names";
+  const memberUrl = "https://localhost:44374/api/Member/available-leaders";
 
   // Fetch members
   const fetchMembers = async () => {

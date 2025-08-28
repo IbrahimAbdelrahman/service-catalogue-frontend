@@ -28,7 +28,7 @@ const SquadList: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [editRow, setEditRow] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Squad>>({});
-  const [searchId, setSearchId] = useState<string>("");
+  
 
   const [view, setView] = useState<"menu" | "list" | "create">("menu");
   const [newSquad, setNewSquad] = useState<Partial<Squad>>({
