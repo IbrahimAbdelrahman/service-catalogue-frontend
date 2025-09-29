@@ -30,7 +30,7 @@ const Header: React.FC = () => {
               aria-label='home'
             >
               <div className='w-layout-vflex clip'>
-                <h1 className='heading-style-h5 text-weight-medium'>Ateko</h1>
+                <h1 className='heading-style-h5 text-weight-medium'>Gen AI</h1>
               </div>
             </a>
 
@@ -119,7 +119,7 @@ const Header: React.FC = () => {
 
               <div className='w-layout-vflex navbar-cta_contact'>
                 <a href='#section-contact' className='button primary w-button'>
-                  Book a demo
+                  Book a meeting
                 </a>
               </div>
             </div>

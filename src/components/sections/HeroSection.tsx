@@ -132,7 +132,7 @@ const HeroSection: React.FC = () => {
                         className='button primary w-button h-auto'
                         onClick={() => handleScrollToSection("contact")}
                       >
-                        Book a demo
+                        Book a meeting
                       </Button>
                     </motion.div>
 
@@ -148,7 +148,7 @@ const HeroSection: React.FC = () => {
                         className='button outline w-button h-auto'
                         onClick={() => handleScrollToSection("services")}
                       >
-                        They trust us
+                        Explore Services
                       </Button>
                     </motion.div>
                   </div>
