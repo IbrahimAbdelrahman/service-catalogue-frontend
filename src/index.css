@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 /* @import "./styles/testimonials.css"; */
+/* @import "./styles/team.css"; */
 
 @custom-variant dark (&:is(.dark *));
 
