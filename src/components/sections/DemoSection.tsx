@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import {
@@ -10,44 +10,9 @@ import {
 
 const DemoSection: React.FC = () => {
   const { ref: sectionRef, isInView: sectionInView } = useScrollAnimation(0.2);
-  const [demoButtonWidth, setDemoButtonWidth] = useState(164.054);
-  const [demoButtonHeight, setDemoButtonHeight] = useState(56);
-  const [imageTransform, setImageTransform] = useState(-2.83025);
-  const [contentTransform, setContentTransform] = useState(5.6605);
 
-  // Dynamic animation for demo button
-  useEffect(() => {
-    const animateDemo = () => {
-      const time = Date.now() * 0.001;
-
-      // Subtle width and height changes
-      setDemoButtonWidth(164.054 + Math.sin(time * 0.5) * 2);
-      setDemoButtonHeight(56 + Math.cos(time * 0.7) * 1);
-
-      // Image wrapper transform
-      setImageTransform(-2.83025 + Math.sin(time * 0.3) * 1.5);
-
-      // Content transform
-      setContentTransform(5.6605 + Math.cos(time * 0.4) * 1.2);
-    };
-
-    const interval = setInterval(animateDemo, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Demo button expand animation variants
-  const demoButtonVariants = {
-    hidden: {
-      width: "56px", // Start with just the avatar size
-      opacity: 0,
-      scale: 0.8,
-    },
-    visible: {
-      width: `${demoButtonWidth}px`, // Expand to full width
-      opacity: 1,
-      scale: 1,
-    },
-  };
+  // Base dimensions for the demo button
+  const baseDemoHeight = 56;
 
   // Content reveal animation (delayed after width expansion)
   const contentVariants = {
@@ -146,13 +111,20 @@ const DemoSection: React.FC = () => {
                     }}
                     className='demo_component w-inline-block'
                     style={{
-                      willChange: "width, height",
-                      height: `${demoButtonHeight}px`,
+                      height: `${baseDemoHeight}px`,
                       overflow: "hidden", // Hide content during expansion
+                      transition: "none", // Prevent CSS transition conflicts
                     }}
-                    variants={demoButtonVariants}
-                    initial='hidden'
-                    animate={sectionInView ? "visible" : "hidden"}
+                    initial={{
+                      width: "56px",
+                      opacity: 0,
+                      scale: 0.8,
+                    }}
+                    animate={{
+                      width: sectionInView ? "280px" : "56px", // Enough width for the full text
+                      opacity: sectionInView ? 1 : 0,
+                      scale: sectionInView ? 1 : 0.8,
+                    }}
                     transition={{
                       duration: 0.8,
                       ease: "easeOut",
@@ -164,14 +136,7 @@ const DemoSection: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div
-                      className='w-layout-vflex demo_image-wrapper'
-                      style={{
-                        willChange: "transform",
-                        transform: `translate3d(${imageTransform}%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)`,
-                        transformStyle: "preserve-3d",
-                      }}
-                    >
+                    <div className='w-layout-vflex demo_image-wrapper'>
                       <div className='w-layout-vflex avatar_wrapper small'>
                         <img
                           src='https://cdn.prod.website-files.com/67e10b83fa5b37426335a2be/67e2f9b7f9c8f6d0256d0b13_Portrait%20of%20a%20Smiling%20Person.jpeg'
@@ -185,10 +150,7 @@ const DemoSection: React.FC = () => {
                     <motion.div
                       className='w-layout-vflex demo_content'
                       style={{
-                        willChange: "width, height, transform",
                         width: "100%",
-                        transform: `translate3d(${contentTransform}%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)`,
-                        transformStyle: "preserve-3d",
                       }}
                       variants={contentVariants}
                       initial='hidden'
@@ -200,7 +162,7 @@ const DemoSection: React.FC = () => {
                       }}
                     >
                       <div className='text-size-regular'>
-                        Schedule a demo with Mathis
+                        Schedule a demo with Amr
                       </div>
                     </motion.div>
                   </motion.a>

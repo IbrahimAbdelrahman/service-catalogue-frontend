@@ -114,14 +114,17 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  transition: all 0.3s ease;
+  /* Remove transition to avoid conflict with Framer Motion */
+  /* transition: all 0.3s ease; */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  min-width: 56px; /* Ensure minimum width for avatar */
 }
 
 .demo_component:hover {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border-color: #06b6d4;
-  transform: translateY(-2px);
+  /* Remove transform to avoid conflict with Framer Motion */
+  /* transform: translateY(-2px); */
 }
 
 .demo_image-wrapper {
