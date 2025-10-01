@@ -3,6 +3,7 @@
 /* @import "./styles/testimonials.css"; */
 /* @import "./styles/team.css"; */
 /* @import "./styles/demo.css"; */
+/* @import "./styles/faq.css"; */
 
 @custom-variant dark (&:is(.dark *));
 
