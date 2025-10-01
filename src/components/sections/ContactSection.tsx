@@ -57,7 +57,7 @@ const ContactSection: React.FC = () => {
   return (
     <section
       id='section-contact'
-      className='bg-gray-800 text-white py-20 px-4'
+      className='bg-[#0d0d0d] text-white py-20 px-4'
       ref={sectionRef}
     >
       <div className='max-w-7xl mx-auto px-8'>
@@ -78,7 +78,7 @@ const ContactSection: React.FC = () => {
                   Let's build something meaningful together
                 </motion.h2>
                 <motion.div
-                  className='text-xl text-gray-300 leading-relaxed'
+                  className='text-xl text-[#f0f0f0] leading-relaxed'
                   variants={fadeInUp}
                   initial='hidden'
                   animate={sectionInView ? "visible" : "hidden"}
@@ -109,11 +109,13 @@ const ContactSection: React.FC = () => {
                     />
                   </div>
                   <div className='flex flex-col gap-1'>
-                    <div className='text-base text-gray-400'>Email address</div>
+                    <div className='text-base text-[#f0f0f0] opacity-70'>
+                      Email address
+                    </div>
                     <div className='text-base text-white'>
                       <a
                         href='mailto:contact@ateko.com'
-                        className='text-white hover:text-cyan-300 transition-colors duration-300'
+                        className='text-white hover:text-[#90fff4] transition-colors duration-300'
                       >
                         contact@ateko.com
                       </a>
@@ -137,7 +139,9 @@ const ContactSection: React.FC = () => {
                     />
                   </div>
                   <div className='flex flex-col gap-1'>
-                    <div className='text-base text-gray-400'>Phone number</div>
+                    <div className='text-base text-[#f0f0f0] opacity-70'>
+                      Phone number
+                    </div>
                     <div className='text-base text-white'>(123) 456 - 7890</div>
                   </div>
                 </motion.div>
@@ -165,7 +169,7 @@ const ContactSection: React.FC = () => {
                     Full Name
                   </label>
                   <input
-                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-cyan-400/50 focus:bg-white/8 focus:shadow-lg focus:shadow-cyan-400/10 placeholder-gray-500'
+                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-[#90fff4]/50 focus:bg-white/8 focus:shadow-lg focus:shadow-[#90fff4]/10 placeholder-[#f0f0f0]/50'
                     maxLength={256}
                     name='name'
                     placeholder=''
@@ -185,7 +189,7 @@ const ContactSection: React.FC = () => {
                     Email Address
                   </label>
                   <input
-                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-cyan-400/50 focus:bg-white/8 focus:shadow-lg focus:shadow-cyan-400/10 placeholder-gray-500'
+                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-[#90fff4]/50 focus:bg-white/8 focus:shadow-lg focus:shadow-[#90fff4]/10 placeholder-[#f0f0f0]/50'
                     maxLength={256}
                     name='email'
                     placeholder=''
@@ -205,7 +209,7 @@ const ContactSection: React.FC = () => {
                     Company / Brand name
                   </label>
                   <input
-                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-cyan-400/50 focus:bg-white/8 focus:shadow-lg focus:shadow-cyan-400/10 placeholder-gray-500'
+                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-[#90fff4]/50 focus:bg-white/8 focus:shadow-lg focus:shadow-[#90fff4]/10 placeholder-[#f0f0f0]/50'
                     maxLength={256}
                     name='company'
                     placeholder=''
@@ -229,7 +233,7 @@ const ContactSection: React.FC = () => {
                     maxLength={5000}
                     id='Message'
                     name='message'
-                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-cyan-400/50 focus:bg-white/8 focus:shadow-lg focus:shadow-cyan-400/10 placeholder-gray-500 min-h-[140px] resize-y font-sans'
+                    className='w-full px-5 py-4 border border-white/15 rounded-xl bg-white/5 text-white text-base transition-all duration-300 focus:outline-none focus:border-[#90fff4]/50 focus:bg-white/8 focus:shadow-lg focus:shadow-[#90fff4]/10 placeholder-[#f0f0f0]/50 min-h-[140px] resize-y font-sans'
                     value={formData.message}
                     onChange={handleInputChange}
                     required
@@ -238,7 +242,8 @@ const ContactSection: React.FC = () => {
 
                 <button
                   type='submit'
-                  className='w-full px-8 py-4 mt-4 border-none rounded-full text-base font-semibold cursor-pointer transition-all duration-300 bg-cyan-300 text-slate-900 hover:bg-cyan-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-300/30 font-sans'
+                  className='w-full px-8 py-4 mt-4 border-none rounded-full text-base font-semibold cursor-pointer transition-all duration-300 bg-[#90fff4] !text-[#0d0d0d] hover:bg-[#90fff4]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#90fff4]/30 font-sans'
+                  style={{ color: "#0d0d0d !important" }}
                 >
                   Submit
                 </button>
